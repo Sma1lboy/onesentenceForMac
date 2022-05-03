@@ -11,28 +11,35 @@ struct ContentView: View {
     @EnvironmentObject var listViewModel : ListViewModel
     
     var body: some View {
-            List() {
-                ForEach(listViewModel.sentences) {sentence in
-                    ListRowView(sentence: sentence)
+        ZStack {
+            if listViewModel.sentences.isEmpty {
+                Text("There is no sentence📝")
+                    .transition(AnyTransition.opacity.animation(.easeIn))
+            } else {
+                List() {
+                    ForEach(listViewModel.sentences) {sentence in
+                        ListRowView(sentence: sentence)
+                    }
+                    .onDelete(perform: listViewModel.deleteSent)
+                    .onMove(perform: listViewModel.moveSent)
+                    
                 }
-                .onDelete(perform: listViewModel.deleteSent)
-                .onMove(perform: listViewModel.moveSent)
+                .listStyle(PlainListStyle())
+            }
+        }
+        .navigationTitle("One sentence")
+        .navigationBarItems(leading: EditButton())
+        .toolbar {
+            ToolbarItemGroup (placement: .bottomBar) {
+                NavigationLink(destination: GearView(), label: {
+                    Image(systemName: "gearshape")
+                })
+                NavigationLink(destination: AddView(), label: {
+                    Image(systemName: "plus")
+                })
                 
             }
-            .listStyle(PlainListStyle())
-            .navigationTitle("One sentence")
-            .navigationBarItems(leading: EditButton())
-            .toolbar {
-                ToolbarItemGroup (placement: .bottomBar) {
-                    NavigationLink(destination: GearView(), label: {
-                        Image(systemName: "gearshape")
-                    })
-                    NavigationLink(destination: AddView(), label: {
-                        Image(systemName: "plus")
-                    })
-  
-                }
-                
+            
         }
         
     }
@@ -67,8 +74,8 @@ struct AboutView : View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView{
-        ContentView()
-            .previewDevice("iPhone 13 Pro")
+            ContentView()
+                .previewDevice("iPhone 13 Pro")
         }
         .environmentObject(ListViewModel())
     }

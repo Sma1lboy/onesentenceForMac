@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SentenceModel : Identifiable{
+struct SentenceModel : Identifiable, Codable{
     let id : String
     let sentence : String
     let createDate : String

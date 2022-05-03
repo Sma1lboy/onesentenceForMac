@@ -15,17 +15,24 @@ import Foundation
  Update
  */
 class ListViewModel : ObservableObject {
-    @Published var sentences : [SentenceModel] = []
+    @Published var sentences : [SentenceModel] = [] {
+        //everytime we did change to the array, this didSet get call
+        didSet {
+            saveSent()
+        }
+    }
+    let SentencesKey : String = "sentences_list"
     
     init() {
         getSentences()
     }
     
     func getSentences() {
-        let newSentences = [        SentenceModel(sentence : "Some dummySome dummySome dummySome dummySome dummySome dummy", createDate : "Jan 19, 2022"),
-                                    SentenceModel(sentence: "testing", createDate : "Jan 20, 2022"),
-                                    SentenceModel(sentence: "testing hahah ahhah ", createDate : "Jan 20, 2022")]
-        sentences.append(contentsOf: newSentences)
+        guard
+            let data = UserDefaults.standard.data(forKey: SentencesKey),
+            let saveSents = try? JSONDecoder().decode([SentenceModel].self,from : data)
+        else {return}
+        self.sentences = saveSents
     }
     func deleteSent(indexSet: IndexSet) {
         sentences.remove(atOffsets: indexSet)
@@ -40,8 +47,13 @@ class ListViewModel : ObservableObject {
     }
     func updateSent(sentence : SentenceModel) {
         //TODO fix it
-//        let index = sentence.sentence.firstIndex(where: {sentence.id == sentence.id})
-//        sentences[index] = sentence.updateSentence()
+        //        let index = sentence.sentence.firstIndex(where: {sentence.id == sentence.id})
+        //        sentences[index] = sentence.updateSentence()
         
+    }
+    func saveSent() {
+        if let encodedData = try? JSONEncoder().encode(sentences) {
+            UserDefaults.standard.set(encodedData, forKey: SentencesKey)
+        }
     }
 }
