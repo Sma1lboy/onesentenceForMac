@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
-    //    let sentence = Sentence();
+    @EnvironmentObject var listViewModel : ListViewModel
     
     var body: some View {
-        NavigationView {
-            VStack {
+            List() {
+                ForEach(listViewModel.sentences) {sentence in
+                    ListRowView(sentence: sentence)
+                }
+                .onDelete(perform: listViewModel.deleteSent)
+                .onMove(perform: listViewModel.moveSent)
                 
             }
+            .listStyle(PlainListStyle())
             .navigationTitle("One sentence")
+            .navigationBarItems(leading: EditButton())
             .toolbar {
                 ToolbarItemGroup (placement: .bottomBar) {
                     NavigationLink(destination: GearView(), label: {
@@ -27,8 +33,8 @@ struct ContentView: View {
   
                 }
                 
-            }
         }
+        
     }
 }
 struct GearView : View {
@@ -55,57 +61,15 @@ struct AboutView : View {
         .offset(y:-30)
     }
 }
-struct AddView : View {
-    @State private var tempStr = ""
-    @State private var tempDate = Date.now
-    
-    var body : some View {
-        Form {
-            Section(header: Text("add sentence")) {
-                TextField("Sentence", text: $tempStr)
-                DatePicker("Date", selection: $tempDate)
-            }
-        }.navigationTitle("Adding")
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button ("Save", action: saveSentence)
-                }
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button(action: {
-                        
-                    }, label: {
-                        Image(systemName: "keyboard")
-                    })
-                    Button("", action: {
-                        
-                    })
-                }
-            }
-    }
-    func saveSentence() {
-        print("saved")
-    }
-}
-class Sentence {
-    var sentence :String
-    var date = Date()
-    init (sentence : String, date: Date) {
-        self.sentence = sentence
-        self.date = date
-    }
-}
-//
-//class Sentence: ObservableObject {
-//    @Published var sentence : String
-//    @Published var date: Date
-//    var identifier = UUID()
-//}
+
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
+        NavigationView{
         ContentView()
             .previewDevice("iPhone 13 Pro")
+        }
+        .environmentObject(ListViewModel())
     }
 }
-
